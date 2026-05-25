@@ -1,0 +1,23 @@
+PRICES = {
+    ("Luxury", "6x6"): 800,
+    ("Luxury", "6x7"): 900,
+    ("Luxury", "5x6"): 750,
+    ("Essential", "6x6"): 600,
+    ("Essential", "6x7"): 680,
+    ("Essential", "5x6"): 550,
+    ("Base", "6x6"): 500,
+    ("Base", "6x7"): 560,
+    ("Base", "5x6"): 450
+}
+
+CATALOG = [
+    {"model": "Luxury", "size": "6x6", "price": PRICES[("Luxury", "6x6")]},
+    {"model": "Luxury", "size": "6x7", "price": PRICES[("Luxury", "6x7")]},
+    {"model": "Luxury", "size": "5x6", "price": PRICES[("Luxury", "5x6")]},
+    {"model": "Essential", "size": "6x6", "price": PRICES[("Essential", "6x6")]},
+    {"model": "Essential", "size": "6x7", "price": PRICES[("Essential", "6x7")]},
+    {"model": "Essential", "size": "5x6", "price": PRICES[("Essential", "5x6")]},
+    {"model": "Base", "size": "6x6", "price": PRICES[("Base", "6x6")]},
+    {"model": "Base", "size": "6x7", "price": PRICES[("Base", "6x7")]},
+    {"model": "Base", "size": "5x6", "price": PRICES[("Base", "5x6")]}
+]

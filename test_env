@@ -1,0 +1,17 @@
+from dotenv import load_dotenv
+import os
+import google.generativeai as genai
+
+
+load_dotenv()
+
+#print("BOT_TOKEN:", os.getenv("BOT_TOKEN"))
+#print("GEMINI_API_KEY:", os.getenv("GEMINI_API_KEY"))
+print("testing....")
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+model = genai.GenerativeModel(os.getenv("GEMINI_MODEL"))
+
+response = model.generate_content("Say hello from gemini.")
+print(response.text)

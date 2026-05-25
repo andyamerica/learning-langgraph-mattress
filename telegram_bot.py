@@ -1,0 +1,83 @@
+import os
+import logging
+from dotenv import load_dotenv
+from telegram.ext import (
+    ApplicationBuilder,
+    MessageHandler,
+    CommandHandler,
+    ContextTypes,
+    filters
+)
+from mattress_router import route_message
+from admin_router import handle_admin_command
+from db_tools import get_catalog
+
+
+load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+# In‑memory per‑user state
+USER_MEMORY: dict[int, dict] = {}  # {user_id: {"model": ..., "size": ...}}
+
+
+async def start(update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Mattress bot is online. Ask me about prices or catalog!")
+
+
+async def ping(update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("pong")
+
+
+async def handle_message(update, context: ContextTypes.DEFAULT_TYPE):
+
+    user_text = update.message.text
+    user_id = str(update.message.from_user.id)
+
+    # Admin commands
+    if user_text.startswith("/admin"):
+        response = await handle_admin_command(user_id, user_text)
+        await update.message.reply_text(response)
+        return
+
+
+    memory = USER_MEMORY.get(user_id, {"model": None, "size": None})
+
+    response_text, new_memory = route_message(user_text, memory)
+
+    USER_MEMORY[user_id] = new_memory
+
+    await update.message.reply_text(response_text)
+
+async def show_catalog_telegram(update, context):
+    items = get_catalog()
+
+    if not items:
+        await update.message.reply_text("The catalog is empty.")
+        return
+
+    for item in items:
+        text = f"**{item['model']}**\n{item['description']}"
+        if item["image_url"]:
+            await update.message.reply_photo(item["image_url"], caption=text)
+        else:
+            await update.message.reply_text(text)
+
+
+def main():
+    if not BOT_TOKEN:
+        raise RuntimeError("BOT_TOKEN is not set in .env")
+
+    application = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("ping", ping))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    application.run_polling()
+
+
+if __name__ == "__main__":
+    main()

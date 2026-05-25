@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    model TEXT NOT NULL,
+    size TEXT NOT NULL,
+    price REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS catalog (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    model TEXT NOT NULL,
+    description TEXT,
+    image_url TEXT
+);
