@@ -3,7 +3,7 @@ from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, Con
 from graph import app
 
 logging.basicConfig(level=logging.INFO)
-BOT_TOKEN = "8960557999:AAGRkHQ-gY1D5Px7XgVlfhyXwRB9_WZGnoQ"
+BOT_TOKEN = "REDACTED"
 
 # Store state per user
 USER_STATES = {}   # {user_id: state_dict}
