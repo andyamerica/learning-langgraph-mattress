@@ -12,8 +12,6 @@ from mattress_router import route_message
 from admin_router import handle_admin_command
 from db_tools import get_catalog
 
-import functools
-print = functools.partial(print, flush=True)
 
 load_dotenv()
 
@@ -22,9 +20,7 @@ logging.basicConfig(level=logging.INFO)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # In‑memory per‑user state
-USER_MEMORY: dict[str, dict] = {}  
-# Example:
-# USER_MEMORY[user_id] = {"model": "...", "size": "...", "last_intent": "..."}
+USER_MEMORY: dict[int, dict] = {}  # {user_id: {"model": ..., "size": ...}}
 
 
 async def start(update, context: ContextTypes.DEFAULT_TYPE):
@@ -36,20 +32,10 @@ async def ping(update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_message(update, context: ContextTypes.DEFAULT_TYPE):
-    
-    # Ignore bot's own messages
-    if update.effective_user and update.effective_user.is_bot:
-        return
-    
+
     user_text = update.message.text
     user_id = str(update.message.from_user.id)
-
-    if not user_text:
-        print("EMPTY MESSAGE RECEIVED — SKIPPING")
-        return
-
-    print("\n=== TELEGRAM Q&A ===")
-    print(f"USER SAID: {user_text}")
+    chat_id = update.message.chat.id
 
     # Admin commands
     if user_text.startswith("/admin"):
@@ -57,27 +43,15 @@ async def handle_message(update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(response)
         return
 
-    # Load existing memory for this user
-    memory = USER_MEMORY.get(
-        user_id,
-        {"model": None, "size": None, "last_intent": None}
-    )
 
-    # Route message (router returns updated memory)
-    response_text, updated_memory = route_message(
-        user_text,
-        user_id=user_id
-    )
+    response_text,memory = USER_MEMORY.get(user_id, {"model": None, "size": None})
 
-    # Save updated memory
-    USER_MEMORY[user_id] = updated_memory
+    #response_text, new_memory = route_message(user_text, memory)
+    response_text, memory = route_message(user_text, user_id=str(chat_id))
 
-    #print(f"BOT REPLY: >>>{response_text}<<<\n\n")
-    print(f"BOT REPLY: >>>{response_text}<<<\n")
+    USER_MEMORY[user_id] = new_memory
 
-    # Send response
     await update.message.reply_text(response_text)
-
 
 async def show_catalog_telegram(update, context):
     items = get_catalog()

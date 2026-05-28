@@ -1,7 +1,12 @@
-import sqlite3
+from db_tools import get_price
 
-conn = sqlite3.connect("mattress.db")
-cur = conn.cursor()
-cur.execute("SELECT model, size, price FROM products")
-print(cur.fetchall())
-conn.close()
+tests = [
+    ("Luxury", None),
+    ("Luxury", "King"),
+    ("Luxury", "Queen"),
+    ("Essential", None),
+    ("Base", None),
+]
+
+for model, size in tests:
+    print(model, size, "→", get_price(model, size))
